@@ -1,0 +1,46 @@
+hash: e0347c577f121abe7383312b2eba1d2c180d6c02f6cf73eabcc72a3a730358fb
+updated: 2018-07-18T11:27:46.321129807+03:00
+imports:
+- name: github.com/armon/go-metrics
+  version: 783273d703149aaeb9897cf58613d5af48861c25
+- name: github.com/hashicorp/consul
+  version: 39f93f011e591c842acc8053a7f5972aa6e592fd
+  subpackages:
+  - api
+- name: github.com/hashicorp/go-cleanhttp
+  version: d5fe4b57a186c716b0e00b8c301cbd9b4182694d
+- name: github.com/hashicorp/go-immutable-radix
+  version: 7f3cd4390caab3250a57f30efdb2a65dd7649ecf
+- name: github.com/hashicorp/go-rootcerts
+  version: 6bb64b370b90e7ef1fa532be9e591a81c3493e00
+- name: github.com/hashicorp/golang-lru
+  version: 0fb14efe8c47ae851c0034ed7a448854d3d34cf3
+  subpackages:
+  - simplelru
+- name: github.com/hashicorp/serf
+  version: 984a73625de3138f44deb38d00878fab39eb6447
+  subpackages:
+  - coordinate
+- name: github.com/kisielk/gotool
+  version: 80517062f582ea3340cd4baf70e86d539ae7d84d
+- name: github.com/mitchellh/go-homedir
+  version: 3864e76763d94a6df2f9960b16a20a33da9f9a66
+- name: github.com/mitchellh/mapstructure
+  version: bb74f1db0675b241733089d5a1faa5dd8b0ef57b
+- name: golang.org/x/lint
+  version: 06c8688daad7faa9da5a0c2f163a3d14aac986ca
+  repo: https://github.com/golang/lint
+  vcs: git
+  subpackages:
+  - golint
+- name: golang.org/x/tools
+  version: 64890f4e2b733655fee5077a5435a8812404c3a3
+  subpackages:
+  - cmd/goimports
+- name: honnef.co/go/tools
+  version: d73ab98e7c39fdcf9ba65062e43d34310f198353
+  subpackages:
+  - cmd/simple
+  - cmd/staticcheck
+  - cmd/unused
+testImports: []

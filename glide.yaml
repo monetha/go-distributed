@@ -1,0 +1,21 @@
+package: github.com/monetha/go-distributed
+import:
+- package: github.com/hashicorp/consul
+  version: ^1.2.1
+  subpackages:
+  - api
+- package: golang.org/x/lint
+  repo: https://github.com/golang/lint
+  vcs: git
+  subpackages:
+  - golint
+- package: golang.org/x/tools
+  subpackages:
+  - cmd/goimports
+- package: honnef.co/go/tools
+  version: ^2017.2.2
+  subpackages:
+  - cmd/simple
+  - cmd/staticcheck
+  - cmd/unused
+- package: github.com/kisielk/gotool
