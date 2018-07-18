@@ -53,5 +53,5 @@ func New(config *Config) (*Broker, error) {
 // Task makes a best effort to ensure that exactly one instance of a task is executing in a cluster.
 // Task may be re-started when needed until it's been closed.
 func (b *Broker) NewTask(key string, fun task.Func) (*task.Task, error) {
-	return task.New(newConsulLocker(b.client, key, LockWaitTime), fun), nil
+	return task.New(NewLocker(b.client, key, LockWaitTime), fun), nil
 }

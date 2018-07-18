@@ -23,7 +23,7 @@ func ExampleNew() {
 	}
 	defer t.Close()
 
-	t2, err := b.NewTask("task2/key", task2)
+	t2, err := b.NewTask("task/key", task2)
 	if err != nil {
 		log.Printf("New task: %v", err)
 		return

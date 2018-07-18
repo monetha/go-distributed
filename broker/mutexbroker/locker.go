@@ -1,27 +1,21 @@
-package consulbroker
+package mutexbroker
 
 import (
-	"fmt"
-	"time"
-
-	"github.com/hashicorp/consul/api"
 	"github.com/monetha/go-distributed/locker"
 )
 
-// Locker wraps Consul distributed lock by implementing Locker interface.
+// Locker implements "distributed locker" using channel.
 type Locker struct {
-	client       *api.Client
-	key          string
-	lockWaitTime time.Duration
-	lock         *api.Lock
+	broker   *Broker
+	key      string
+	leaderCh chan struct{}
 }
 
 // NewLocker creates new Locker instance.
-func NewLocker(client *api.Client, key string, lockWaitTime time.Duration) *Locker {
+func NewLocker(broker *Broker, key string) *Locker {
 	return &Locker{
-		client:       client,
-		key:          key,
-		lockWaitTime: lockWaitTime,
+		broker: broker,
+		key:    key,
 	}
 }
 
@@ -38,41 +32,28 @@ func (l *Locker) Key() string {
 // assume that the locker is held until Unlock(), application must be able
 // to handle the locker being lost.
 func (l *Locker) Lock(stopCh <-chan struct{}) (<-chan struct{}, error) {
-	if l.lock != nil {
+	if l.leaderCh != nil {
 		return nil, locker.ErrLockHeld
 	}
 
-	lock, err := l.client.LockOpts(&api.LockOptions{
-		Key:          l.key,
-		LockWaitTime: l.lockWaitTime,
-	})
+	err := l.broker.lock(l.key, stopCh)
 	if err != nil {
-		return nil, fmt.Errorf("locker: creating lock opts %s: %v", l.key, err)
+		return nil, err
 	}
 
-	lockCh, err := lock.Lock(stopCh)
-	if err != nil {
-		return nil, fmt.Errorf("locker: lock %s: %v", l.key, err)
-	}
-
-	if lockCh == nil {
-		return nil, locker.LockCancelled(l.key)
-	}
-
-	l.lock = lock
-
-	return lockCh, nil
+	l.leaderCh = make(chan struct{})
+	return l.leaderCh, nil
 }
 
 // Unlock released the locker. It is an error to call this
 // if the locker is not currently held.
 func (l *Locker) Unlock() error {
-	if l.lock == nil {
+	if l.leaderCh == nil {
 		return locker.ErrLockNotHeld
 	}
-	defer func() {
-		l.lock = nil
-	}()
 
-	return l.lock.Unlock()
+	close(l.leaderCh)
+	l.leaderCh = nil
+
+	return l.broker.unlock(l.key)
 }

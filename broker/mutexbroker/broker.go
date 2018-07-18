@@ -23,7 +23,7 @@ func New() *Broker {
 
 // NewTask creates new long-running task in current process.
 func (b *Broker) NewTask(key string, fun task.Func) (*task.Task, error) {
-	return task.New(newMutexLocker(b, key), fun), nil
+	return task.New(NewLocker(b, key), fun), nil
 }
 
 func (b *Broker) lock(name string, stopCh <-chan struct{}) error {
@@ -52,46 +52,4 @@ func (b *Broker) unlock(name string) error {
 	}
 	<-mc
 	return nil
-}
-
-func newMutexLocker(broker *Broker, key string) *mutexLocker {
-	return &mutexLocker{
-		broker: broker,
-		key:    key,
-	}
-}
-
-type mutexLocker struct {
-	broker   *Broker
-	key      string
-	leaderCh chan struct{}
-}
-
-func (l *mutexLocker) Key() string {
-	return l.key
-}
-
-func (l *mutexLocker) Lock(stopCh <-chan struct{}) (<-chan struct{}, error) {
-	if l.leaderCh != nil {
-		return nil, locker.ErrLockHeld
-	}
-
-	err := l.broker.lock(l.key, stopCh)
-	if err != nil {
-		return nil, err
-	}
-
-	l.leaderCh = make(chan struct{})
-	return l.leaderCh, nil
-}
-
-func (l *mutexLocker) Unlock() error {
-	if l.leaderCh == nil {
-		return locker.ErrLockNotHeld
-	}
-
-	close(l.leaderCh)
-	l.leaderCh = nil
-
-	return l.broker.unlock(l.key)
 }
